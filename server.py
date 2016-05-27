@@ -9,10 +9,7 @@ import aiocoap.resource as resource
 import aiocoap
 
 class MyRespResource(resource.ObservableResource):
-    """
-    Example resource that can be observed. The `notify` method keeps scheduling
-    itself, and calles `update_state` to trigger sending notifications.
-    """
+
     def __init__(self):
         super(MyRespResource, self).__init__()
 

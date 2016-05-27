@@ -20,6 +20,7 @@ def main():
     protocol = yield from Context.create_client_context()
 
     payload = b"Request parameter.\n" * 1
+    # coap://127.0.0.1/myresp
     request = Message(code=POST, payload=payload)
     request.opt.uri_host = '127.0.0.1'
     request.opt.uri_path = ("myresp",)
