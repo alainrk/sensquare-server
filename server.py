@@ -30,7 +30,7 @@ class MyRespResource(resource.ObservableResource):
 def main():
     # Resource tree creation
     root = resource.Site()
-    # root.add_resource(('.well-known', 'core'), resource.WKCResource(root.get_resources_as_linkheader))
+    root.add_resource(('.well-known', 'core'), resource.WKCResource(root.get_resources_as_linkheader))
     root.add_resource(('myresp',), MyRespResource())
     asyncio.async(aiocoap.Context.create_server_context(root))
     asyncio.get_event_loop().run_forever()
