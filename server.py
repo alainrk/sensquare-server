@@ -5,6 +5,7 @@ import logging
 import asyncio
 import aiocoap.resource as resource
 import aiocoap
+import mgrs
 
 '''
 
@@ -12,7 +13,7 @@ PYTHON 3 NEEDED !!!!!!!!!!!!!!!!!!!
 
 Library mgrs:
 
-pip install https://pypi.python.org/packages/8a/38/d7824a8a7dd8a181d5da11977f36467429009967296ce23b6911233fe4b0/mgrs-1.3.3.tar.gz
+pip3 install --user https://pypi.python.org/packages/8a/38/d7824a8a7dd8a181d5da11977f36467429009967296ce23b6911233fe4b0/mgrs-1.3.3.tar.gz
 
 '''
 
