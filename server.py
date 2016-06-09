@@ -24,15 +24,16 @@ class MyRespResource(resource.ObservableResource):
 
     @asyncio.coroutine
     def render_get(self, request):
-        content = "GET Ma vaffanculo!".encode('ascii')
+        content = "GET Not supported!".encode('ascii')
         response = aiocoap.Message(code=aiocoap.CONTENT, payload=content)
         return response
 
     @asyncio.coroutine
     def render_post(self, request):
-        print('POST payload: %s' % request.payload)
-        content = request.payload
-        payload = ("Post accepted. Parameter: %r" % content).encode('utf8')
+        #print('POST payload: %s' % request.payload)
+        content = (request.payload).decode('utf8')
+        print (content)
+        payload = ("Server ACK. Req: %r" % content).encode('utf8')
         return aiocoap.Message(code=aiocoap.CONTENT, payload=payload)
 
 

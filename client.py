@@ -10,6 +10,7 @@
 
 import logging
 import asyncio
+import json
 
 from aiocoap import *
 
@@ -19,9 +20,24 @@ logging.basicConfig(level=logging.INFO)
 def main():
     protocol = yield from Context.create_client_context()
 
-    payload = b"Request parameter.\n" * 1
+    jsonarr = []
+    data = {}
+    data['timestamp'] = 45678976543543242
+    data['sensor'] = 4
+    data['latitude'] = 45.43543242
+    data['longitude'] = 11.43543242
+    data['value'] = 13.3232
+
+    jsonarr.append(data)
+
+    json_arr = json.dumps(jsonarr)
+    json_obj = json.dumps(data)
+
+    bytereprArr = str.encode(json_arr)
+    bytereprObj = str.encode(json_obj)
+
     # coap://127.0.0.1/myresp
-    request = Message(code=POST, payload=payload)
+    request = Message(code=POST, payload=bytereprArr)
     request.opt.uri_host = '127.0.0.1'
     request.opt.uri_path = ("myresp",)
 
