@@ -9,6 +9,7 @@ import mgrs
 import json
 import random
 import time
+from Query import *
 
 '''
 
@@ -47,11 +48,14 @@ class MyRespResource(resource.ObservableResource):
         client_value = clientdata['value']
 
         # TODO: Database and logic stuff
+        queryObj = Query()
+        queryObj.insertInAllData(client_sensor, client_lat, client_long, "ABFSJH4FSUEFHJ", client_value, client_time)
+        queryObj.close()
 
         ###### SENDING ######
         jsonarr = []
         data = {}
-        data['timeout'] = random.randint(5,15)
+        data['timeout'] = random.randint(15,30)
         data['sensor'] = client_sensor
         data['lat'] = client_lat
         data['long'] = client_long
