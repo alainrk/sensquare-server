@@ -23,12 +23,25 @@ class Query:
 	def __init__(self):
 		self.conn = sqlite3.connect("db.sqlite")
 
-	def insertInAllData(self, type_id, latitude, longitude, mgrs, value, timest):
+	def insertInAllSensorData(self, user, type_id, latitude, longitude, mgrs, value, timest):
 		cur = self.conn.cursor()
-		query = "INSERT INTO all_sensor_data(type, lat, long, mgrs, value, timest) VALUES (?, ?, ?, ?, ?, ?)"
+		query = "INSERT INTO all_sensor_data(user, type, lat, long, mgrs, value, timest) VALUES (?, ?, ?, ?, ?, ?, ?)"
 		#print(query)
-		print ("Query users: ", cur.execute(query, (type_id, latitude, longitude, mgrs, value, timest)))
+		print ("Query users: ", cur.execute(query, (user, type_id, latitude, longitude, mgrs, value, timest)))
+		self.conn.commit()
 
+	def insertInAllWifiData(self, user, ssid, latitude, longitude, mgrs, bssid, rssi, timest):
+		cur = self.conn.cursor()
+		query = "INSERT INTO all_wifi_data(user, ssid, lat, long, mgrs, bssid, rssi, timest) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+		#print(query)
+		print ("Query users: ", cur.execute(query, (user, ssid, latitude, longitude, mgrs, bssid, rssi, timest)))
+		self.conn.commit()
+
+	def insertInAllLTEData(self, user, latitude, longitude, mgrs, time, sinr, operator, tech):
+		cur = self.conn.cursor()
+		query = "INSERT INTO all_tel_data(user, lat, long, mgrs, timest, sinr, operator, tech) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+		#print(query)
+		print ("Query users: ", cur.execute(query, (user, latitude, longitude, mgrs, time, sinr, operator, tech)))
 		self.conn.commit()
 
 	# def insertNewUser(self, chatId, isGroup, titleOrUsername, date_start):

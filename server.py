@@ -33,6 +33,10 @@ pip3 install --user https://pypi.python.org/packages/8a/38/d7824a8a7dd8a181d5da1
 
 '''
 
+TYPE_AMPLITUDE = 100;
+TYPE_WIFI = 101;
+TYPE_TEL = 102;
+
 class MyRespResource(resource.ObservableResource):
 
     def __init__(self):
@@ -53,6 +57,7 @@ class MyRespResource(resource.ObservableResource):
         clientdata = json.loads(content)[0] # Only one sensor per request
         print (clientdata)
 
+        client_user = clientdata['user']
         client_time = clientdata['time']
         client_lat = clientdata['lat']
         client_long = clientdata['long']
@@ -64,13 +69,25 @@ class MyRespResource(resource.ObservableResource):
         mgrs_coord = m.toMGRS(client_lat, client_long)
 
         queryObj = Query()
-        queryObj.insertInAllData(client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
+
+        if client_sensor == TYPE_WIFI:
+            bssid, ssid, rssi = client_value.split(",")
+            if not bssid.startswith("00:00:00:00"): # No wifi connected
+                queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, rssi, client_time)
+
+        elif client_sensor == TYPE_TEL:
+            tech, sinr, operator = client_value.split(",")
+            queryObj.insertInAllLTEData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
+
+        else:
+            queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
+
         queryObj.close()
 
         ###### SENDING ######
         jsonarr = []
         data = {}
-        data['timeout'] = random.randint(100, 150)
+        data['timeout'] = random.randint(30, 60)
         data['sensor'] = client_sensor
         data['lat'] = client_lat
         data['long'] = client_long
