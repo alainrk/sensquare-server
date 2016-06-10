@@ -6,6 +6,9 @@ import asyncio
 import aiocoap.resource as resource
 import aiocoap
 import mgrs
+import json
+import random
+import time
 
 '''
 
@@ -30,11 +33,39 @@ class MyRespResource(resource.ObservableResource):
 
     @asyncio.coroutine
     def render_post(self, request):
-        #print('POST payload: %s' % request.payload)
+        random.seed(time.time())
+
+        ###### RECEIVING ######
         content = (request.payload).decode('utf8')
-        print (content)
-        payload = ("Server ACK. Req: %r" % content).encode('utf8')
-        return aiocoap.Message(code=aiocoap.CONTENT, payload=payload)
+        clientdata = json.loads(content)[0] # Only one sensor per request
+        print (clientdata)
+
+        client_time = clientdata['time']
+        client_lat = clientdata['lat']
+        client_long = clientdata['long']
+        client_sensor = clientdata['sensor']
+        client_value = clientdata['value']
+
+        # TODO: Database and logic stuff
+
+        ###### SENDING ######
+        jsonarr = []
+        data = {}
+        data['timeout'] = random.randint(5,15)
+        data['sensor'] = client_sensor
+        data['lat'] = client_lat
+        data['long'] = client_long
+        data['radius'] = random.randint(100, 200)
+
+        jsonarr.append(data)
+
+        json_arr = json.dumps(jsonarr)
+        json_obj = json.dumps(data)
+
+        bytereprArr = str.encode(json_arr)
+        bytereprObj = str.encode(json_obj)
+
+        return aiocoap.Message(code=aiocoap.CONTENT, payload=bytereprArr)
 
 
 def main():
