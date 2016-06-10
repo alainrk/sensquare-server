@@ -19,6 +19,18 @@ Library mgrs:
 
 pip3 install --user https://pypi.python.org/packages/8a/38/d7824a8a7dd8a181d5da11977f36467429009967296ce23b6911233fe4b0/mgrs-1.3.3.tar.gz
 
+>>> latitude = 42.0
+>>> longitude = -93.0
+
+>>> m = mgrs.MGRS()
+>>> c = m.toMGRS(latitude, longitude)
+>>> c
+'15TWG0000049776'
+
+>>> d = m.toLatLon(c)
+>>> d
+(41.999997975127997, -93.000000000000014)
+
 '''
 
 class MyRespResource(resource.ObservableResource):
@@ -48,14 +60,17 @@ class MyRespResource(resource.ObservableResource):
         client_value = clientdata['value']
 
         # TODO: Database and logic stuff
+        m = mgrs.MGRS()
+        mgrs_coord = m.toMGRS(client_lat, client_long)
+
         queryObj = Query()
-        queryObj.insertInAllData(client_sensor, client_lat, client_long, "ABFSJH4FSUEFHJ", client_value, client_time)
+        queryObj.insertInAllData(client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
         queryObj.close()
 
         ###### SENDING ######
         jsonarr = []
         data = {}
-        data['timeout'] = random.randint(15,30)
+        data['timeout'] = random.randint(100, 150)
         data['sensor'] = client_sensor
         data['lat'] = client_lat
         data['long'] = client_long
