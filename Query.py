@@ -37,7 +37,7 @@ class Query:
 		print ("Query users: ", cur.execute(query, (user, ssid, latitude, longitude, mgrs, bssid, rssi, timest)))
 		self.conn.commit()
 
-	def insertInAllLTEData(self, user, latitude, longitude, mgrs, time, sinr, operator, tech):
+	def insertInAllTelData(self, user, latitude, longitude, mgrs, time, sinr, operator, tech):
 		cur = self.conn.cursor()
 		query = "INSERT INTO all_tel_data(user, lat, long, mgrs, timest, sinr, operator, tech) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 		#print(query)

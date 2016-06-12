@@ -37,6 +37,23 @@ TYPE_AMPLITUDE = 100;
 TYPE_WIFI = 101;
 TYPE_TEL = 102;
 
+'''
+Name, MGRS Filter, TypeNum
+Light|12|5
+Pressure|8|6
+Humidity|11|12
+Temperature|10|13
+Audio Amplitude|12|100
+WiFi|13|101
+Tel|13|102
+
+Usage for filter:
+>>> a="AAAAABBBBBCCCCC"  ==> Length: 15
+>>> a[:13]
+'AAAAABBBBBCCC'          ==> Length: 13
+'''
+mgrs_mask = {5:12, 6:8, 12:11, 13:10, 100:12, 101:13, 102:13}
+
 class MyRespResource(resource.ObservableResource):
 
     def __init__(self):
@@ -77,7 +94,7 @@ class MyRespResource(resource.ObservableResource):
 
         elif client_sensor == TYPE_TEL:
             tech, sinr, operator = client_value.split(",")
-            queryObj.insertInAllLTEData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
+            queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
 
         else:
             queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
