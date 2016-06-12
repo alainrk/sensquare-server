@@ -9,6 +9,8 @@ import mgrs
 import json
 import random
 import time
+import signal
+import sys
 from Query import *
 
 '''
@@ -67,64 +69,77 @@ class MyRespResource(resource.ObservableResource):
 
     @asyncio.coroutine
     def render_post(self, request):
-        random.seed(time.time())
+        try:
+            random.seed(time.time())
 
-        ###### RECEIVING ######
-        content = (request.payload).decode('utf8')
-        clientdata = json.loads(content)[0] # Only one sensor per request
-        print (clientdata)
+            ###### RECEIVING ######
+            content = (request.payload).decode('utf8')
+            clientdata = json.loads(content)[0] # Only one sensor per request
+            print (clientdata)
 
-        client_user = clientdata['user']
-        client_time = clientdata['time']
-        client_lat = clientdata['lat']
-        client_long = clientdata['long']
-        client_sensor = clientdata['sensor']
-        client_value = clientdata['value']
+            client_user = clientdata['user']
+            client_time = clientdata['time']
+            client_lat = clientdata['lat']
+            client_long = clientdata['long']
+            client_sensor = clientdata['sensor']
+            client_value = clientdata['value']
 
-        # TODO: Database and logic stuff
-        m = mgrs.MGRS()
-        mgrs_coord = m.toMGRS(client_lat, client_long)
+            # TODO: Database and logic stuff
+            m = mgrs.MGRS()
+            mgrs_coord = m.toMGRS(client_lat, client_long)
 
-        queryObj = Query()
+            queryObj = Query()
 
-        if client_sensor == TYPE_WIFI:
-            bssid, ssid, rssi = client_value.split(",")
-            if not bssid.startswith("00:00:00:00"): # No wifi connected
-                queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, rssi, client_time)
+            if client_sensor == TYPE_WIFI:
+                bssid, ssid, rssi = client_value.split(",")
+                if not bssid.startswith("00:00:00:00"): # No wifi connected
+                    queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, rssi, client_time)
 
-        elif client_sensor == TYPE_TEL:
-            tech, sinr, operator = client_value.split(",")
-            queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
+            elif client_sensor == TYPE_TEL:
+                tech, sinr, operator = client_value.split(",")
+                queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
 
-        else:
-            queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
+            else:
+                queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
 
-        queryObj.close()
+            queryObj.close()
 
-        ###### SENDING ######
-        jsonarr = []
-        data = {}
-        data['timeout'] = random.randint(30, 60)
-        data['sensor'] = client_sensor
-        data['lat'] = client_lat
-        data['long'] = client_long
-        data['radius'] = random.randint(100, 200)
+            ###### SENDING ######
+            jsonarr = []
+            data = {}
+            data['timeout'] = random.randint(30, 60)    # TODO: Calculate timeout based on fresh/compl/.. in DB
+            data['sensor'] = client_sensor              # Obviously the same arrived
+            data['lat'] = client_lat                    # I think the same arrived
+            data['long'] = client_long                  # I think the same arrived
+            data['radius'] = random.randint(100, 200)   # TODO: Calculate radius from MGRS, and based on data in DB
 
-        jsonarr.append(data)
+            jsonarr.append(data)
 
-        json_arr = json.dumps(jsonarr)
-        json_obj = json.dumps(data)
+            json_arr = json.dumps(jsonarr)
+            json_obj = json.dumps(data)
 
-        bytereprArr = str.encode(json_arr)
-        bytereprObj = str.encode(json_obj)
+            bytereprArr = str.encode(json_arr)
+            bytereprObj = str.encode(json_obj)
 
-        return aiocoap.Message(code=aiocoap.CONTENT, payload=bytereprArr)
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=bytereprArr)
 
+        except:
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=b'[]')
+
+def handler(signum, frame):
+    print('\n\nServer killed!\n')
+    sys.exit(0)
 
 def main():
+    # Kill catch
+    signal.signal(signal.SIGTERM, handler)
+    signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGQUIT, handler)
+    signal.signal(signal.SIGABRT, handler)
+
     # Resource tree creation
     root = resource.Site()
-    root.add_resource(('.well-known', 'core'), resource.WKCResource(root.get_resources_as_linkheader))
+    #root.add_resource(('.well-known', 'core'), resource.WKCResource(root.get_resources_as_linkheader))
     root.add_resource(('myresp',), MyRespResource())
     asyncio.async(aiocoap.Context.create_server_context(root))
     asyncio.get_event_loop().run_forever()
