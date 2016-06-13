@@ -12,6 +12,8 @@ import time
 import signal
 import sys
 from Query import *
+from datetime import datetime
+
 
 '''
 
@@ -78,7 +80,7 @@ class MyRespResource(resource.ObservableResource):
             print (clientdata)
 
             client_user = clientdata['user']
-            client_time = clientdata['time']
+            client_time = clientdata['time'] # NOT USED
             client_lat = clientdata['lat']
             client_long = clientdata['long']
             client_sensor = clientdata['sensor']
@@ -91,13 +93,15 @@ class MyRespResource(resource.ObservableResource):
             queryObj = Query()
 
             if client_sensor == TYPE_WIFI:
-                bssid, ssid, rssi = client_value.split(",")
-                if not bssid.startswith("00:00:00:00"): # No wifi connected
-                    queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, rssi, client_time)
+                pass
+                # bssid, ssid, rssi = client_value.split(",")
+                # if not bssid.startswith("00:00:00:00"): # No wifi connected
+                #     queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, rssi, client_time)
 
             elif client_sensor == TYPE_TEL:
-                tech, sinr, operator = client_value.split(",")
-                queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
+                pass
+                # tech, sinr, operator = client_value.split(",")
+                # queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
 
             else:
                 queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
@@ -107,7 +111,7 @@ class MyRespResource(resource.ObservableResource):
             ###### SENDING ######
             jsonarr = []
             data = {}
-            data['timeout'] = random.randint(30, 60)    # TODO: Calculate timeout based on fresh/compl/.. in DB
+            data['timeout'] = random.randint(3000, 6000)    # TODO: Calculate timeout based on fresh/compl/.. in DB
             data['sensor'] = client_sensor              # Obviously the same arrived
             data['lat'] = client_lat                    # I think the same arrived
             data['long'] = client_long                  # I think the same arrived
@@ -123,7 +127,8 @@ class MyRespResource(resource.ObservableResource):
 
             return aiocoap.Message(code=aiocoap.CONTENT, payload=bytereprArr)
 
-        except:
+        except Exception as e:
+            print (str(e))
             return aiocoap.Message(code=aiocoap.CONTENT, payload=b'[]')
 
 def handler(signum, frame):
