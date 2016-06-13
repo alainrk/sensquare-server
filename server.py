@@ -58,6 +58,9 @@ Usage for filter:
 '''
 mgrs_mask = {5:12, 6:8, 12:11, 13:10, 100:12, 101:13, 102:13}
 
+def italytimestamp(legal=True):
+    return int(time.time() + (2 if legal else 1)*3600)
+
 class MyRespResource(resource.ObservableResource):
 
     def __init__(self):
@@ -77,7 +80,7 @@ class MyRespResource(resource.ObservableResource):
             ###### RECEIVING ######
             content = (request.payload).decode('utf8')
             clientdata = json.loads(content)[0] # Only one sensor per request
-            print (clientdata)
+            #print (clientdata)
 
             client_user = clientdata['user']
             client_time = clientdata['time'] # NOT USED
@@ -93,18 +96,18 @@ class MyRespResource(resource.ObservableResource):
             queryObj = Query()
 
             if client_sensor == TYPE_WIFI:
-                pass
-                # bssid, ssid, rssi = client_value.split(",")
-                # if not bssid.startswith("00:00:00:00"): # No wifi connected
-                #     queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, rssi, client_time)
+                bssid, ssid, strength = client_value.split(",")
+                if not bssid.startswith("00:00:00:00"): # No wifi connected
+                    print(bssid, ssid, strength)
+                    queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, strength, italytimestamp())
 
             elif client_sensor == TYPE_TEL:
-                pass
-                # tech, sinr, operator = client_value.split(",")
-                # queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, client_time, sinr, operator, tech)
+                tech, strength, operator = client_value.split(",")
+                print(tech, strength, operator)
+                queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, italytimestamp(), strength, operator, tech)
 
             else:
-                queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, client_time)
+                queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, italytimestamp())
 
             queryObj.close()
 

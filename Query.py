@@ -22,8 +22,12 @@ Usage
 
 >>> query.close()
 
+Query utili d'esempio:
+select name, mgrs, timestamp, value, mgrs_filter, sensors.type as sensor_id from all_sensor_data join sensors on all_sensor_data.type = sensors.type where sensors.type=6;
+
 
 '''
+
 
 # cnx = mysql.connector.connect(user='pydroid', password='pydroid', database='crowdroid')
 # cursor = cnx.cursor()
@@ -78,27 +82,27 @@ class Query:
     def insertInAllSensorData(self, user, type_id, latitude, longitude, mgrs, value, timest):
         try:
             self.cursor = self.conn.cursor()
-            query = "INSERT INTO all_sensor_data(user, type, latitude, longitude, mgrs, value) VALUES (%s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO all_sensor_data(user, type, latitude, longitude, mgrs, value, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             #print(query)
-            res = self.cursor.execute(query, (user, type_id, latitude, longitude, mgrs, value))
-            print (res)
+            res = self.cursor.execute(query, (user, type_id, latitude, longitude, mgrs, value, timest))
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
-	# def insertInAllWifiData(self, user, ssid, latitude, longitude, mgrs, bssid, rssi, timest):
-	# 	cur = self.conn.cursor()
-	# 	query = "INSERT INTO all_wifi_data(user, ssid, lat, long, mgrs, bssid, rssi, timest) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-	# 	#print(query)
-	# 	print ("Query users: ", cur.execute(query, (user, ssid, latitude, longitude, mgrs, bssid, rssi, timest)))
-	# 	self.conn.commit()
-    #
-	# def insertInAllTelData(self, user, latitude, longitude, mgrs, time, sinr, operator, tech):
-	# 	cur = self.conn.cursor()
-	# 	query = "INSERT INTO all_tel_data(user, lat, long, mgrs, timest, sinr, operator, tech) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-	# 	#print(query)
-	# 	print ("Query users: ", cur.execute(query, (user, latitude, longitude, mgrs, time, sinr, operator, tech)))
-	# 	self.conn.commit()
+    def insertInAllWifiData(self, user, ssid, latitude, longitude, mgrs, bssid, strength, timestamp):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "INSERT INTO all_wifi_data(user, ssid, latitude, longitude, mgrs, bssid, strength, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            res = self.cursor.execute(query, (user, ssid, latitude, longitude, mgrs, bssid, strength, timestamp))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
 
+    def insertInAllTelData(self, user, latitude, longitude, mgrs, timestamp, strength, operator, tech):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "INSERT INTO all_tel_data(user, latitude, longitude, mgrs, timestamp, strength, operator, tech) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            res = self.cursor.execute(query, (user, latitude, longitude, mgrs, timestamp, strength, operator, tech))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
 
     def close(self):
         self.cursor.close()
