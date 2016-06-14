@@ -5,9 +5,13 @@ import mgrs
 import json
 import random
 
-TYPE_AMPLITUDE = 100;
-TYPE_WIFI = 101;
-TYPE_TEL = 102;
+TYPE_AMPLITUDE = 100
+TYPE_WIFI = 101
+TYPE_TEL = 102
+DEFAULT_RADIUS = 999
+DEFAULT_TIMEOUT = 999
+
+granToMeters = {0:1, 1:10, 2:100, 3:1000, 4:10000, 5:100000}
 
 '''
 @zone, Full coord mgrs (1m precision, even though granularity then will cut)
@@ -27,7 +31,7 @@ Coord given =       "32T PQ 12389 12389"
 granularity 10m =>      4 (1234* 1234*)     DOES NOT MATCH
 granularity 1000m =>    2 (12*** 12***)     MATCH
 '''
-def belongto(zone, coord, granularity):
+def belongsto(zone, coord, granularity):
     # Division in "32T PQ 12345 12345"
     gridsq_zone, bigsq_zone, x_zone, y_zone = zone[:3], zone[3:5], zone[5:10], zone[10:15]
     gridsq_coord, bigsq_coord, x_coord, y_coord = coord[:3], coord[3:5], coord[5:10], coord[10:15]
@@ -73,7 +77,49 @@ def saveData(clientdata):
 Returns (radius, timeout) based on rules in DB
 '''
 def getRadiusAndTimeoutForClient(csensor, cmgrs):
-    return random.randint(30, 60), random.randint(50, 100)
+    # Index field in DB rows
+    fMGRS, fGRAN, fTIMEOUT = 3, 4, 7
+
+    # Getting rules
+    queryObj = Query()
+    rules = list(queryObj.getAllRulesForSensor(csensor))
+    queryObj.close()
+
+    belongs = list(filter(lambda r:belongsto(r[fMGRS], cmgrs, r[fGRAN]), rules))
+    #print(belongs)
+
+    if belongs:
+        # Radius from max granularity or default
+        finest = max(belongs, key=lambda x:x[fGRAN])
+        radius = granToMeters[finest[fGRAN]] if finest else DEFAULT_RADIUS
+
+        # Timeout from min sampled
+        samplest = min(belongs, key=lambda x:x[fTIMEOUT])
+        timeout = samplest[fTIMEOUT] if samplest else DEFAULT_TIMEOUT
+    else:
+        radius, timeout = DEFAULT_RADIUS, DEFAULT_TIMEOUT
+
+    return (radius, timeout)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # print(belongto("32TPQ1234512345", "32TPQ1238912389", 4)) # False

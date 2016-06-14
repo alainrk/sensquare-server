@@ -48,6 +48,7 @@ class MyRespResource(resource.ObservableResource):
             ###### RECEIVING ######
             content = (request.payload).decode('utf8')
             clientdata = json.loads(content)[0] # Only one sensor per request
+            print ("Received ", clientdata)
 
             ###### SAVE in DB ######
             saveData(clientdata)
@@ -55,7 +56,7 @@ class MyRespResource(resource.ObservableResource):
             ##### GET THE RULES #####
             csensor, clatitude, clongitude = clientdata['sensor'], clientdata['lat'], clientdata['long']
             cmgrs = mgrs_instance.toMGRS(clatitude, clongitude)
-            radius, timeout = getRadiusAndTimeoutForClient(csensor, cmgrs)
+            radius, timeout = getRadiusAndTimeoutForClient(csensor, cmgrs.decode("utf-8")) # Avoid b'string'
 
             ###### SENDING ######
             jsonarr = []
