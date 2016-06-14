@@ -79,12 +79,23 @@ class Query:
         res = self.cursor.execute("select * from sensors")
         return self.cursor
 
-    def insertInAllSensorData(self, user, type_id, latitude, longitude, mgrs, value, timest):
+    # Minimum granularity and time comprehensive the given coord
+    def getFinestRule(self, sensor, mgrs_client):
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("select * from rules")
+            return self.cursor
+
+    def getAllRules(self):
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("select * from rules")
+            return self.cursor
+
+    def insertInAllSensorData(self, user, sensor, latitude, longitude, mgrs, value, timest):
         try:
             self.cursor = self.conn.cursor()
             query = "INSERT INTO all_sensor_data(user, type, latitude, longitude, mgrs, value, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             #print(query)
-            res = self.cursor.execute(query, (user, type_id, latitude, longitude, mgrs, value, timest))
+            res = self.cursor.execute(query, (user, sensor, latitude, longitude, mgrs, value, timest))
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
