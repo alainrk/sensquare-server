@@ -56,15 +56,15 @@ class MyRespResource(resource.ObservableResource):
             ##### GET THE RULES #####
             csensor, clatitude, clongitude = clientdata['sensor'], clientdata['lat'], clientdata['long']
             cmgrs = mgrs_instance.toMGRS(clatitude, clongitude)
-            radius, timeout = getRadiusAndTimeoutForClient(csensor, cmgrs.decode("utf-8")) # Avoid b'string'
+            center_lat, center_long, radius, timeout = getRadiusAndTimeoutForClient(csensor, cmgrs.decode("utf-8")) # Avoid b'string'
 
             ###### SENDING ######
             jsonarr = []
             data = {}
             data['timeout'] = timeout
             data['sensor'] = csensor
-            data['lat'] = clatitude
-            data['long'] = clongitude
+            data['lat'] = center_lat if center_lat else clatitude
+            data['long'] = center_long if center_long else clatitude
             data['radius'] = radius
 
             jsonarr.append(data)

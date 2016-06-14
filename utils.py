@@ -40,6 +40,36 @@ def belongsto(zone, coord, granularity):
             x_zone[0:granularity] == x_coord[0:granularity] and \
             y_zone[0:granularity] == y_coord[0:granularity]
 
+'''
+Return center (latitude, longitude) of mgrs (full coords) given a granularity
+
+Gran 3, 32T PQ 123** 123** ===> 32T PQ 12350 12350 (Half!)
+Gran 2, 32T PQ 12*** 12*** ===> 32T PQ 12500 12500 (Half!)
+
+Es:
+>>> gran = 3
+>>> x = "99999"
+>>> pad = "5"+("0"*(5-gran-1))
+>>> pad
+'50'
+>>> x = x[:3]+pad
+>>> x
+'99950'
+
+'''
+def getCenterOfMGRSInCoord(fmgrs, gran):
+    try:
+        m = mgrs.MGRS()
+        if -1 < gran < 5:
+            # Division in "32T PQ 12345 12345"
+            gridsq_fmgrs, bigsq_fmgrs, x_fmgrs, y_fmgrs = fmgrs[:3], fmgrs[3:5], fmgrs[5:10], fmgrs[10:15]
+            pad = "5"+("0"*(5-gran-1))
+            x, y = x_fmgrs[:gran]+pad, y_fmgrs[:gran]+pad
+            new_mgrs = gridsq_fmgrs + bigsq_fmgrs + x + y
+            return m.toLatLon(str.encode(new_mgrs)) # MGRS Lib accept only bytes!
+        return m.toLatLon(str.encode(fmgrs))
+    except Exception as e:
+        print ("Exception getCenterOfMGRSInCoord: "+str(e))
 
 def italytimestamp(legal=True):
     return int(time.time() + (2 if legal else 1)*3600)
@@ -91,15 +121,17 @@ def getRadiusAndTimeoutForClient(csensor, cmgrs):
     if belongs:
         # Radius from max granularity or default
         finest = max(belongs, key=lambda x:x[fGRAN])
-        radius = granToMeters[finest[fGRAN]] if finest else DEFAULT_RADIUS
+        c_lat, c_long = getCenterOfMGRSInCoord(finest[fMGRS], finest[fGRAN])
+        radius = granToMeters[finest[fGRAN]]/2 # TODO: calc raggio circoscritto boh
 
         # Timeout from min sampled
         samplest = min(belongs, key=lambda x:x[fTIMEOUT])
-        timeout = samplest[fTIMEOUT] if samplest else DEFAULT_TIMEOUT
+        timeout = samplest[fTIMEOUT]
     else:
+        c_lat, c_long = None, None
         radius, timeout = DEFAULT_RADIUS, DEFAULT_TIMEOUT
 
-    return (radius, timeout)
+    return (c_lat, c_long, radius, timeout)
 
 
 
