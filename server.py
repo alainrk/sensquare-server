@@ -41,23 +41,6 @@ TYPE_AMPLITUDE = 100;
 TYPE_WIFI = 101;
 TYPE_TEL = 102;
 
-'''
-Name, MGRS Filter, TypeNum
-Light|12|5
-Pressure|8|6
-Humidity|11|12
-Temperature|10|13
-Audio Amplitude|12|100
-WiFi|13|101
-Tel|13|102
-
-Usage for filter:
->>> a="AAAAABBBBBCCCCC"  ==> Length: 15
->>> a[:13]
-'AAAAABBBBBCCC'          ==> Length: 13
-'''
-mgrs_mask = {5:12, 6:8, 12:11, 13:10, 100:12, 101:13, 102:13}
-
 def italytimestamp(legal=True):
     return int(time.time() + (2 if legal else 1)*3600)
 
@@ -80,7 +63,7 @@ class MyRespResource(resource.ObservableResource):
             ###### RECEIVING ######
             content = (request.payload).decode('utf8')
             clientdata = json.loads(content)[0] # Only one sensor per request
-            #print (clientdata)
+            print (clientdata)
 
             client_user = clientdata['user']
             client_time = clientdata['time'] # NOT USED
