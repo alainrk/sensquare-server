@@ -47,7 +47,6 @@ class Query:
         try:
             self.cursor = self.conn.cursor()
             query = "INSERT INTO all_sensor_data(user, type, latitude, longitude, mgrs, value, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            #print(query)
             res = self.cursor.execute(query, (user, sensor, latitude, longitude, mgrs, value, timest))
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
