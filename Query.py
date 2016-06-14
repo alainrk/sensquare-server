@@ -1,71 +1,19 @@
 import mysql.connector
 
 '''
-Usage
-
->>> from querytest import *
->>> query = Query()
->>> datas = query.getAllSensors()
-
->>> for i in datas:
-...    print (i)
-...
-(5, 'Light', 12)
-(6, 'Pressure', 8)
-(12, 'Humidity', 11)
-(13, 'Temperature', 10)
-(100, 'Audio Amplitude', 12)
-(101, 'WiFi', 13)
-(102, 'Tel', 13)
-(989, 'Pippo', 12)
-(999, 'Puppo', 12)
-
->>> query.close()
-
 Query utili d'esempio:
+
+>>> r = list(p.getAllRulesForSensor(100))
+>>> a = list(map(lambda x: list(x), r))
+>>> b = list(filter(lambda x: x[0]<10, a))
+>>> b
+[[9, 100, 'Default Audio', '32TPQ8628029570', 4, 999999999, 999999999999999999, 1800, 1465913543]]
+
+########
+
 select name, mgrs, timestamp, value, mgrs_filter, sensors.type as sensor_id from all_sensor_data join sensors on all_sensor_data.type = sensors.type where sensors.type=6;
 
-
 '''
-
-
-# cnx = mysql.connector.connect(user='pydroid', password='pydroid', database='crowdroid')
-# cursor = cnx.cursor()
-
-######################################################
-
-# cursor.execute("insert into sensors (type, name, mgrs_filter) values (%s, %s, %s)", (12, "Humidity", 11))
-# cursor.execute("insert into sensors (type, name, mgrs_filter) values (%s, %s, %s)", (13, "Temperature", 10))
-# cursor.execute("insert into sensors (type, name, mgrs_filter) values (%s, %s, %s)", (100, "Audio Amplitude", 12))
-# cursor.execute("insert into sensors (type, name, mgrs_filter) values (%s, %s, %s)", (101, "WiFi", 13))
-# cursor.execute("insert into sensors (type, name, mgrs_filter) values (%s, %s, %s)", (102, "Tel", 13))
-#
-#
-# cnx.commit()
-# cursor.close()
-# cnx.close()
-
-######################################################
-
-# par = "e"
-# cursor.execute("select * from sensors where name like (%s)", ("%" + par + "%",))
-#
-# for c in cursor:
-#     print(c)
-#
-# cnx.commit()
-# cursor.close()
-# cnx.close()
-
-######################################################
-
-# cursor.execute("UPDATE sensors SET name='Puppo' WHERE name=%s AND type=%s", ("Pippo",999))
-#
-# cnx.commit()
-# cursor.close()
-# cnx.close()
-
-######################################################
 
 class Query:
     conn = None
@@ -88,6 +36,11 @@ class Query:
     def getAllRules(self):
             self.cursor = self.conn.cursor()
             res = self.cursor.execute("select * from rules")
+            return self.cursor
+
+    def getAllRulesForSensor(self, sensor):
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("select * from rules where type=%s", (sensor,))
             return self.cursor
 
     def insertInAllSensorData(self, user, sensor, latitude, longitude, mgrs, value, timest):
