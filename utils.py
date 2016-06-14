@@ -12,6 +12,7 @@ DEFAULT_RADIUS = 999
 DEFAULT_TIMEOUT = 999
 
 granToMeters = {5:1, 4:10, 3:100, 2:1000, 1:10000, 0:100000}
+granToRadius = {5:1, 4:7, 3:70, 2:700, 1:7000, 0:70000}
 
 '''
 @zone, Full coord mgrs (1m precision, even though granularity then will cut)
@@ -112,7 +113,7 @@ Returns (radius, timeout) based on rules in DB
 def getRadiusAndTimeoutForClient(csensor, cmgrs):
     # Index field in DB rows
     fMGRS, fGRAN, fTIMEOUT = 3, 4, 7
-
+    print("Client: ",cmgrs)
     # Getting rules
     queryObj = Query()
     rules = list(queryObj.getAllRulesForSensor(csensor))
@@ -125,7 +126,7 @@ def getRadiusAndTimeoutForClient(csensor, cmgrs):
         # Radius from max granularity or default
         finest = max(belongs, key=lambda x:x[fGRAN])
         c_lat, c_long = getCenterOfMGRSInCoord(finest[fMGRS], finest[fGRAN])
-        radius = granToMeters[finest[fGRAN]] # TODO: calc raggio circoscritto boh
+        radius = granToRadius[finest[fGRAN]] # TODO: calc raggio circoscritto boh
 
         # Timeout from min sampled
         samplest = min(belongs, key=lambda x:x[fTIMEOUT])
