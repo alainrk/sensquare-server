@@ -11,7 +11,7 @@ TYPE_TEL = 102
 DEFAULT_RADIUS = 999
 DEFAULT_TIMEOUT = 999
 
-granToMeters = {0:1, 1:10, 2:100, 3:1000, 4:10000, 5:100000}
+granToMeters = {5:1, 4:10, 3:100, 2:1000, 1:10000, 0:100000}
 
 '''
 @zone, Full coord mgrs (1m precision, even though granularity then will cut)
@@ -66,10 +66,13 @@ def getCenterOfMGRSInCoord(fmgrs, gran):
             pad = "5"+("0"*(5-gran-1))
             x, y = x_fmgrs[:gran]+pad, y_fmgrs[:gran]+pad
             new_mgrs = gridsq_fmgrs + bigsq_fmgrs + x + y
+            print ("\nGran: "+str(gran)+"\n"+fmgrs+"\n"+new_mgrs+"\n")
             return m.toLatLon(str.encode(new_mgrs)) # MGRS Lib accept only bytes!
-        return m.toLatLon(str.encode(fmgrs))
+        else:
+            return m.toLatLon(str.encode(fmgrs))
     except Exception as e:
         print ("Exception getCenterOfMGRSInCoord: "+str(e))
+        return m.toLatLon(str.encode(fmgrs))
 
 def italytimestamp(legal=True):
     return int(time.time() + (2 if legal else 1)*3600)
@@ -122,7 +125,7 @@ def getRadiusAndTimeoutForClient(csensor, cmgrs):
         # Radius from max granularity or default
         finest = max(belongs, key=lambda x:x[fGRAN])
         c_lat, c_long = getCenterOfMGRSInCoord(finest[fMGRS], finest[fGRAN])
-        radius = granToMeters[finest[fGRAN]]/2 # TODO: calc raggio circoscritto boh
+        radius = granToMeters[finest[fGRAN]] # TODO: calc raggio circoscritto boh
 
         # Timeout from min sampled
         samplest = min(belongs, key=lambda x:x[fTIMEOUT])

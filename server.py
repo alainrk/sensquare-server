@@ -48,7 +48,7 @@ class MyRespResource(resource.ObservableResource):
             ###### RECEIVING ######
             content = (request.payload).decode('utf8')
             clientdata = json.loads(content)[0] # Only one sensor per request
-            print ("Received ", clientdata)
+            #print ("Received ", clientdata)
 
             ###### SAVE in DB ######
             saveData(clientdata)
