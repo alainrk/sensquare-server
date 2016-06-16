@@ -26,7 +26,7 @@ class Query:
     def getAllSensors(self):
         try:
             self.cursor = self.conn.cursor()
-            res = self.cursor.execute("select * from sensors")
+            res = self.cursor.execute("SELECT * FROM sensors")
             return self.cursor
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
@@ -39,11 +39,18 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
+    def deleteRuleById(self, value):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "DELETE FROM rules WHERE id=%s"
+            res = self.cursor.execute(query, (value,))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
 
     def getAllRules(self):
         try:
             self.cursor = self.conn.cursor()
-            res = self.cursor.execute("select * from rules")
+            res = self.cursor.execute("SELECT * FROM rules")
             return self.cursor
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
@@ -51,7 +58,7 @@ class Query:
     def getAllRulesForSensor(self, sensor):
         try:
             self.cursor = self.conn.cursor()
-            res = self.cursor.execute("select * from rules where type=%s", (sensor,))
+            res = self.cursor.execute("SELECT * FROM rules WHERE type=%s", (sensor,))
             return self.cursor
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
