@@ -24,25 +24,37 @@ class Query:
         self.conn = mysql.connector.connect(user=user, password=passw, database=db, host=host)
 
     def getAllSensors(self):
-        self.cursor = self.conn.cursor()
-        res = self.cursor.execute("select * from sensors")
-        return self.cursor
-
-    # Minimum granularity and time comprehensive the given coord
-    def getFinestRule(self, sensor, mgrs_client):
+        try:
             self.cursor = self.conn.cursor()
-            res = self.cursor.execute("select * from rules")
+            res = self.cursor.execute("select * from sensors")
             return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def insertRule(self, sensor, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "INSERT INTO rules(type, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            res = self.cursor.execute(query, (sensor, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
 
     def getAllRules(self):
+        try:
             self.cursor = self.conn.cursor()
             res = self.cursor.execute("select * from rules")
             return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
 
     def getAllRulesForSensor(self, sensor):
+        try:
             self.cursor = self.conn.cursor()
             res = self.cursor.execute("select * from rules where type=%s", (sensor,))
             return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
 
     def insertInAllSensorData(self, user, sensor, latitude, longitude, mgrs, value, timest):
         try:
