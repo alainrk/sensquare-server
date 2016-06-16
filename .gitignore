@@ -4,3 +4,4 @@ build
 *.egg-info
 dist
 readme_db
+auth.txt

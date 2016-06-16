@@ -64,7 +64,8 @@ def getCenterOfMGRSInCoord(fmgrs, gran):
         if -1 < gran < 5:
             # Division in "32T PQ 12345 12345"
             gridsq_fmgrs, bigsq_fmgrs, x_fmgrs, y_fmgrs = fmgrs[:3], fmgrs[3:5], fmgrs[5:10], fmgrs[10:15]
-            pad = "5"+("0"*(5-gran-1))
+            # pad = "5"+("0"*(5-gran-1))
+            pad = "5"*(5-gran)
             x, y = x_fmgrs[:gran]+pad, y_fmgrs[:gran]+pad
             new_mgrs = gridsq_fmgrs + bigsq_fmgrs + x + y
             print ("\nGran: "+str(gran)+"\n"+fmgrs+"\n"+new_mgrs+"\n")

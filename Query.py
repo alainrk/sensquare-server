@@ -20,7 +20,8 @@ class Query:
     cursor = None
 
     def __init__(self):
-        self.conn = mysql.connector.connect(user='pydroid', password='pydroid', database='crowdroid')
+        db, user, passw, host = tuple(map(lambda x:x.strip("\n").split(":")[1], open("auth.txt", "r").readlines()))
+        self.conn = mysql.connector.connect(user=user, password=passw, database=db, host=host)
 
     def getAllSensors(self):
         self.cursor = self.conn.cursor()
