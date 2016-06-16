@@ -79,7 +79,6 @@ def getCenterOfMGRSInCoord(fmgrs, gran):
 def italytimestamp(legal=True):
     return int(time.time() + (2 if legal else 1)*3600)
 
-
 def saveData(clientdata):
     client_user = clientdata['user']
     client_time = clientdata['time'] # NOT USED
