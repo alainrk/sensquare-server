@@ -19,7 +19,7 @@ class Query:
             x,y = x[:granularity], y[:granularity]
             table = "all_wifi_data" if sensor == TYPE_WIFI else "all_tel_data" if sensor == TYPE_TEL else "all_sensor_data"
             query = "SELECT * FROM "+table+" WHERE mgrs REGEXP '"+gridsq+bigsq+x+"[[:digit:]]{%s}"+y+"[[:digit:]]{%s}' AND timestamp >= %s"
-            print(query)
+            #print("getSensingForSensorByTimeAndZone: ",query)
             if sensor != TYPE_TEL and sensor != TYPE_WIFI:
                 query += " AND type = %s"
                 res = self.cursor.execute(query, (5-granularity, 5-granularity, timeStart, sensor))
@@ -56,7 +56,7 @@ class Query:
     def deleteOldRules(self, timestamp):
         try:
             self.cursor = self.conn.cursor()
-            query = "DELETE FROM rules WHERE timestamp<=%s"
+            query = "DELETE FROM rules WHERE expire_time<=%s"
             res = self.cursor.execute(query, (timestamp,))
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
