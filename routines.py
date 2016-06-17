@@ -1,23 +1,20 @@
 from utils import *
 
+# TODO Testing hard on this!
 def cleanRules():
-    fEXPCOUNT = 5
-
+    fID, fSENSOR, fMGRS, fGRAN, fEXPCOUNT, fTIMEOUT = 0, 1, 3, 4, 5, 7
+    # Remove the oldest by TIMEOUT
     queryObj = Query()
-    rules = list(queryObj.deleteOldRules(italytimestamp()))
+    queryObj.deleteOldRules(italytimestamp())
     queryObj.close()
 
+    # Remove the EXPIRE_COUNT reached
+    queryObj = Query()
+    rules = list(queryObj.getAllRules())
 
-    # TODO Implement remove for EXPIRE_COUNT
-    # Use this: select * from all_wifi_data where mgrs regexp '32TPQ867[[:digit:]]{2}312[[:digit:]]{2}'
+    for rule in rules:
+        sensings = list(getSensingForSensorByTimeAndZone(rule[fSENSOR], rule[fTIMEOUT], rule[fMGRS], rule[fGRAN]))
+        if len(sensings) >= rule[fEXPCOUNT]:
+            queryObj.deleteRuleById(rule[fID])
 
-    # queryObj = Query()
-    # rules = list(queryObj.getAllRules())
-    # queryObj.close()
-    #
-    # oldRules = list(filter(lambda x:x[fEXPCOUNT] >= timeNow, rules))
-    # if oldRules:
-    #     queryObj = Query()
-    #     for rule in oldRules:
-    #         pass
-    #     queryObj.close()
+    queryObj.close()
