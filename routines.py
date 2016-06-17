@@ -9,6 +9,8 @@ def cleanRules():
 
 
     # TODO Implement remove for EXPIRE_COUNT
+    # Use this: select * from all_wifi_data where mgrs regexp '32TPQ8671[[:digit:]]3127[[:digit:]]'
+
     # queryObj = Query()
     # rules = list(queryObj.getAllRules())
     # queryObj.close()
