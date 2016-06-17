@@ -1,19 +1,8 @@
 import mysql.connector
 
-'''
-Query utili d'esempio:
-
->>> r = list(p.getAllRulesForSensor(100))
->>> a = list(map(lambda x: list(x), r))
->>> b = list(filter(lambda x: x[0]<10, a))
->>> b
-[[9, 100, 'Default Audio', '32TPQ8628029570', 4, 999999999, 999999999999999999, 1800, 1465913543]]
-
-########
-
-select name, mgrs, timestamp, value, mgrs_filter, sensors.type as sensor_id from all_sensor_data join sensors on all_sensor_data.type = sensors.type where sensors.type=6;
-
-'''
+TYPE_AMPLITUDE = 100
+TYPE_WIFI = 101
+TYPE_TEL = 102
 
 class Query:
     conn = None
@@ -22,6 +11,23 @@ class Query:
     def __init__(self):
         db, user, passw, host = tuple(map(lambda x:x.strip("\n").split(":")[1], open("auth.txt", "r").readlines()))
         self.conn = mysql.connector.connect(user=user, password=passw, database=db, host=host)
+
+    def getSensingForSensorByTimeAndZone(self, sensor, timeStart, zone, granularity):
+        try:
+            self.cursor = self.conn.cursor()
+            gridsq, bigsq, x, y = zone[:3], zone[3:5], zone[5:10], zone[10:15]
+            x,y = x[:granularity], y[:granularity]
+            table = "all_wifi_data" if sensor == TYPE_WIFI else "all_tel_data" if sensor == TYPE_TEL else "all_sensor_data"
+            query = "SELECT * FROM "+table+" WHERE mgrs REGEXP '"+gridsq+bigsq+x+"[[:digit:]]{%s}"+y+"[[:digit:]]{%s}' AND timestamp >= %s"
+            print(query)
+            if sensor != TYPE_TEL and sensor != TYPE_WIFI:
+                query += " AND type = %s"
+                res = self.cursor.execute(query, (5-granularity, 5-granularity, timeStart, sensor))
+            else:
+                res = self.cursor.execute(query, (5-granularity, 5-granularity, timeStart))
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
 
     def getAllSensors(self):
         try:
