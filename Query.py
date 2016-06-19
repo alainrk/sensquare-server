@@ -61,6 +61,19 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
+    def deleteOldRulesAndGetThem(self, timestamp):
+        try:
+            self.cursor = self.conn.cursor()
+            queryS = "SELECT * FROM rules WHERE expire_time<=%s"
+            res = self.cursor.execute(queryS, (timestamp,))
+            deleted = list(self.cursor)
+            
+            queryD = "DELETE FROM rules WHERE expire_time<=%s"
+            res = self.cursor.execute(queryD, (timestamp,))
+            return deleted
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
     def getAllRules(self):
         try:
             self.cursor = self.conn.cursor()

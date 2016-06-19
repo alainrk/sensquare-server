@@ -3,9 +3,10 @@ from utils import *
 # TODO Testing hard on this!
 def cleanRules():
     fID, fSENSOR, fMGRS, fGRAN, fEXPCOUNT, fTIMESTAMP = 0, 1, 3, 4, 5, 8
+    
     # Remove the oldest by TIMEOUT
     queryObj = Query()
-    queryObj.deleteOldRules(italytimestamp())
+    delRules = queryObj.deleteOldRulesAndGetThem(italytimestamp())
     queryObj.close()
 
     # Remove the EXPIRE_COUNT reached
@@ -17,7 +18,8 @@ def cleanRules():
         if len(sensings) >= rule[fEXPCOUNT]:
             print("len sensing, rule_expcount: ",len(sensings), rule[fEXPCOUNT])
             print("REMOVING RULE: ",rule[fID])
+            delRules += rule
             queryObj.deleteRuleById(rule[fID])
-            # TODO: Save this set of sensings
 
     queryObj.close()
+    return delRules
