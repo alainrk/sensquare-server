@@ -12,6 +12,50 @@ class Query:
         db, user, passw, host = tuple(map(lambda x:x.strip("\n").split(":")[1], open("auth.txt", "r").readlines()))
         self.conn = mysql.connector.connect(user=user, password=passw, database=db, host=host)
 
+###############################################################################
+######################### GET QUERIES
+###############################################################################
+
+    def getStakeholders(self):
+        try:
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("SELECT * FROM stakeholders")
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def getSubscriptionByUserAndSensor(self, id_user, sensor):
+        try:
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("SELECT * FROM subscription WHERE id_user=%s AND sensor=%s", (id_user, sensor))
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def getAllRules(self):
+        try:
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("SELECT * FROM rules")
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def getAllStakeholdersRulesForSensor(self, sensor, stakeholder):
+        try:
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("SELECT * FROM stakeholders_rules WHERE type=%s AND stakeholder_id=%s", (sensor,stakeholder))
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def getAllRulesForSensor(self, sensor):
+        try:
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("SELECT * FROM rules WHERE type=%s", (sensor,))
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
     def getSensingForSensorByTimeAndZone(self, sensor, timeStart, zone, granularity):
         try:
             self.cursor = self.conn.cursor()
@@ -37,56 +81,39 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
+###############################################################################
+######################### INSERT QUERIES
+###############################################################################
+
+    def insertStakeholder(self, name):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "INSERT INTO stakeholders(name) VALUES (%s)"
+            res = self.cursor.execute(query, (name,))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def insertSubscription(self, id_user, id_stakeholder, sensor):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "INSERT INTO subscription(id_user, id_stakeholder, sensor) VALUES (%s, %s, %s)"
+            res = self.cursor.execute(query, (id_user, id_stakeholder, sensor))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def insertStakeholderRule(self, sensor, stakeholder_id, description, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "INSERT INTO rules(type, stakeholder_id, description, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            res = self.cursor.execute(query, (sensor, stakeholder_id, description, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
     def insertRule(self, sensor, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp):
         try:
             self.cursor = self.conn.cursor()
             query = "INSERT INTO rules(type, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             res = self.cursor.execute(query, (sensor, name, mgrs_area, granularity, expire_count, expire_time, sample_time, timestamp))
-        except mysql.connector.Error as err:
-            print("DB ERROR: {}".format(err))
-
-    def deleteRuleById(self, value):
-        try:
-            self.cursor = self.conn.cursor()
-            query = "DELETE FROM rules WHERE id=%s"
-            res = self.cursor.execute(query, (value,))
-        except mysql.connector.Error as err:
-            print("DB ERROR: {}".format(err))
-
-    def deleteOldRules(self, timestamp):
-        try:
-            self.cursor = self.conn.cursor()
-            query = "DELETE FROM rules WHERE expire_time<=%s"
-            res = self.cursor.execute(query, (timestamp,))
-        except mysql.connector.Error as err:
-            print("DB ERROR: {}".format(err))
-
-    def deleteOldRulesAndGetThem(self, timestamp):
-        try:
-            self.cursor = self.conn.cursor()
-            queryS = "SELECT * FROM rules WHERE expire_time<=%s"
-            res = self.cursor.execute(queryS, (timestamp,))
-            deleted = list(self.cursor)
-            
-            queryD = "DELETE FROM rules WHERE expire_time<=%s"
-            res = self.cursor.execute(queryD, (timestamp,))
-            return deleted
-        except mysql.connector.Error as err:
-            print("DB ERROR: {}".format(err))
-
-    def getAllRules(self):
-        try:
-            self.cursor = self.conn.cursor()
-            res = self.cursor.execute("SELECT * FROM rules")
-            return self.cursor
-        except mysql.connector.Error as err:
-            print("DB ERROR: {}".format(err))
-
-    def getAllRulesForSensor(self, sensor):
-        try:
-            self.cursor = self.conn.cursor()
-            res = self.cursor.execute("SELECT * FROM rules WHERE type=%s", (sensor,))
-            return self.cursor
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
@@ -113,6 +140,55 @@ class Query:
             res = self.cursor.execute(query, (user, latitude, longitude, mgrs, timestamp, strength, operator, tech))
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
+
+###############################################################################
+######################### DELETE QUERIES
+###############################################################################
+
+    def deleteRuleById(self, value):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "DELETE FROM rules WHERE id=%s"
+            res = self.cursor.execute(query, (value,))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def deleteOldRules(self, timestamp):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "DELETE FROM rules WHERE expire_time<=%s"
+            res = self.cursor.execute(query, (timestamp,))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    def deleteOldRulesAndGetThem(self, timestamp):
+        try:
+            self.cursor = self.conn.cursor()
+            queryS = "SELECT * FROM rules WHERE expire_time<=%s"
+            res = self.cursor.execute(queryS, (timestamp,))
+            deleted = list(self.cursor)
+
+            queryD = "DELETE FROM rules WHERE expire_time<=%s"
+            res = self.cursor.execute(queryD, (timestamp,))
+            return deleted
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+    # If sensor -1 delete all
+    def deleteSubscription(self, id_user, id_stakeholder, sensor):
+        try:
+            self.cursor = self.conn.cursor()
+            if sensor == -1:
+                query = "DELETE FROM subscription WHERE id_user=%s AND id_stakeholder=%s"
+                res = self.cursor.execute(query, (id_user,id_stakeholder))
+            else:
+                query = "DELETE FROM subscription WHERE id_user=%s AND id_stakeholder=%s AND sensor=%s"
+                res = self.cursor.execute(query, (id_user,id_stakeholder,sensor))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+###############################################################################
+###############################################################################
 
     def close(self):
         try:

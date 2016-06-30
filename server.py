@@ -12,31 +12,33 @@ from datetime import datetime
 
 
 '''
-
 PYTHON 3 NEEDED !!!!!!!!!!!!!!!!!!!
-
 Library mgrs:
-
 pip3 install --user https://pypi.python.org/packages/8a/38/d7824a8a7dd8a181d5da11977f36467429009967296ce23b6911233fe4b0/mgrs-1.3.3.tar.gz
-
->>> latitude = 42.0
->>> longitude = -93.0
-
->>> m = mgrs.MGRS()
->>> c = m.toMGRS(latitude, longitude)
->>> c
-'15TWG0000049776'
-
->>> d = m.toLatLon(c)
->>> d
-(41.999997975127997, -93.000000000000014)
-
 '''
 
-class MyRespResource(resource.ObservableResource):
+class GetSubscriptions(resource.ObservableResource):
 
     def __init__(self):
-        super(MyRespResource, self).__init__()
+        super(GetSubscriptions, self).__init__()
+
+    @asyncio.coroutine
+    def render_post(self, request):
+        pass
+
+class UpdateSubscription(resource.ObservableResource):
+
+    def __init__(self):
+        super(UpdateSubscription, self).__init__()
+
+    @asyncio.coroutine
+    def render_post(self, request):
+        pass
+
+class SensingSend(resource.ObservableResource):
+
+    def __init__(self):
+        super(SensingSend, self).__init__()
 
     @asyncio.coroutine
     def render_post(self, request):
@@ -54,9 +56,9 @@ class MyRespResource(resource.ObservableResource):
             saveData(clientdata)
 
             ##### GET THE RULES #####
-            csensor, clatitude, clongitude = clientdata['sensor'], clientdata['lat'], clientdata['long']
+            cuser, csensor, clatitude, clongitude = clientdata['user'], clientdata['sensor'], clientdata['lat'], clientdata['long']
             cmgrs = mgrs_instance.toMGRS(clatitude, clongitude)
-            center_lat, center_long, radius, timeout = getRadiusAndTimeoutForClient(csensor, cmgrs.decode("utf-8")) # Avoid b'string'
+            center_lat, center_long, radius, timeout = getRadiusAndTimeoutForClient(cuser, csensor, cmgrs.decode("utf-8")) # Avoid b'string'
 
             ###### SENDING ######
             jsonarr = []
@@ -95,7 +97,9 @@ def main():
     # Resource tree creation
     root = resource.Site()
     #root.add_resource(('.well-known', 'core'), resource.WKCResource(root.get_resources_as_linkheader))
-    root.add_resource(('myresp',), MyRespResource())
+    root.add_resource(('sensing_send',), SensingSend())
+    root.add_resource(('get_subscriptions',), GetSubscriptions())
+    root.add_resource(('update_subscriptions',), UpdateSubscription())
     asyncio.async(aiocoap.Context.create_server_context(root))
     asyncio.get_event_loop().run_forever()
 
