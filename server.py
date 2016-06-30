@@ -24,7 +24,41 @@ class GetSubscriptions(resource.ObservableResource):
 
     @asyncio.coroutine
     def render_post(self, request):
-        pass
+        try:
+            ###### INITIALIZE #####
+            content = (request.payload).decode('utf8')
+            clientdata = json.loads(content)[0] # Just one element in jsonarray received
+
+            ###### RECEIVING ######
+            queryObj = Query()
+            stakeholders = list(queryObj.getStakeholders())
+            subscribedStakeholders = list(queryObj.getSubscribedStakeholders(clientdata['user']))
+
+            subIds = list(map(lambda x:x[0], subscribedStakeholders))
+            queryObj.close()
+
+            ###### SENDING ######
+            jsonarr = []
+            for s in stakeholders:
+                data = {}
+                print(s)
+                data['id'] = s[0]
+                data['name'] = s[1]
+                data['subscribed'] = 1 if s[0] in subIds else 0
+                jsonarr.append(data)
+
+            json_arr = json.dumps(jsonarr)
+            json_obj = json.dumps(data)
+
+            bytereprArr = str.encode(json_arr)
+            bytereprObj = str.encode(json_obj)
+
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=bytereprArr)
+
+        except Exception as e:
+            print ("Exception MAIN: "+str(e))
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=b'[]')
+
 
 class UpdateSubscription(resource.ObservableResource):
 
@@ -33,7 +67,18 @@ class UpdateSubscription(resource.ObservableResource):
 
     @asyncio.coroutine
     def render_post(self, request):
-        pass
+        try:
+            ###### INITIALIZE #####
+            content = (request.payload).decode('utf8')
+            print (content)
+            clientdata = json.loads(content)[0] # Just one element in jsonarray received
+
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=b"")
+
+        except Exception as e:
+            print ("Exception MAIN: "+str(e))
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=b'[]')
+
 
 class SensingSend(resource.ObservableResource):
 

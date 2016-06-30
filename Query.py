@@ -24,6 +24,14 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
+    def getSubscribedStakeholders(self, id_user):
+        try:
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("SELECT DISTINCT id_stakeholder,name FROM subscription LEFT JOIN stakeholders ON subscription.id_stakeholder=stakeholders.id WHERE id_user=%s",(id_user,))
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
     def getSubscriptionByUserAndSensor(self, id_user, sensor):
         try:
             self.cursor = self.conn.cursor()
