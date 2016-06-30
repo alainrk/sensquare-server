@@ -70,8 +70,23 @@ class UpdateSubscription(resource.ObservableResource):
         try:
             ###### INITIALIZE #####
             content = (request.payload).decode('utf8')
-            print (content)
-            clientdata = json.loads(content)[0] # Just one element in jsonarray received
+
+            ###### RECEIVING ######
+            clientdata = json.loads(content)
+            cuser = clientdata[0]['user']
+
+            queryObj = Query()
+            stakeholders = queryObj.deleteAllSubscriptionForUser(cuser)
+            for subscription in clientdata[1:]:
+                # TODO: Currently insert for each sensor
+                queryObj.insertSubscription(cuser, subscription['id'], 5)
+                queryObj.insertSubscription(cuser, subscription['id'], 6)
+                queryObj.insertSubscription(cuser, subscription['id'], 12)
+                queryObj.insertSubscription(cuser, subscription['id'], 13)
+                queryObj.insertSubscription(cuser, subscription['id'], 100)
+                queryObj.insertSubscription(cuser, subscription['id'], 101)
+                queryObj.insertSubscription(cuser, subscription['id'], 102)
+            queryObj.close()
 
             return aiocoap.Message(code=aiocoap.CONTENT, payload=b"")
 

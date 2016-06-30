@@ -195,6 +195,15 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
+    def deleteAllSubscriptionForUser(self, id_user):
+        try:
+            self.cursor = self.conn.cursor()
+            query = "DELETE FROM subscription WHERE id_user=%s"
+            res = self.cursor.execute(query, (id_user,))
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+
 ###############################################################################
 ###############################################################################
 
