@@ -89,7 +89,7 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
-
+    # TODO Add WHERE all_sensor_data.timestamp >= subscription.timestamp
     def getSensorDataForStakeholders(self, id_stakeholder, sensor):
         try:
             self.cursor = self.conn.cursor()
