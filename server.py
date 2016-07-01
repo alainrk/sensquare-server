@@ -16,6 +16,22 @@ PYTHON 3 NEEDED !!!!!!!!!!!!!!!!!!!
 Library mgrs:
 pip3 install --user https://pypi.python.org/packages/8a/38/d7824a8a7dd8a181d5da11977f36467429009967296ce23b6911233fe4b0/mgrs-1.3.3.tar.gz
 '''
+class CalcThroughput(resource.ObservableResource):
+
+    def __init__(self):
+        super(CalcThroughput, self).__init__()
+
+    @asyncio.coroutine
+    def render_post(self, request):
+        try:
+            content = (request.payload).decode('utf8')
+            print (sys.getsizeof(content)+sys.getsizeof(request))
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=b'[]')
+
+        except Exception as e:
+            print ("Exception MAIN: "+str(e))
+            return aiocoap.Message(code=aiocoap.CONTENT, payload=b'[]')
+
 
 class GetSubscriptions(resource.ObservableResource):
 
@@ -160,6 +176,7 @@ def main():
     root.add_resource(('sensing_send',), SensingSend())
     root.add_resource(('get_subscriptions',), GetSubscriptions())
     root.add_resource(('update_subscriptions',), UpdateSubscription())
+    root.add_resource(('calc_throughput',), CalcThroughput())
     asyncio.async(aiocoap.Context.create_server_context(root))
     asyncio.get_event_loop().run_forever()
 

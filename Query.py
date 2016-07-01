@@ -169,11 +169,11 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
-    def insertInAllTelData(self, user, latitude, longitude, mgrs, timestamp, strength, operator, tech):
+    def insertInAllTelData(self, user, latitude, longitude, mgrs, timestamp, strength, operator, tech, throughput):
         try:
             self.cursor = self.conn.cursor()
-            query = "INSERT INTO all_tel_data(user, latitude, longitude, mgrs, timestamp, strength, operator, tech) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-            res = self.cursor.execute(query, (user, latitude, longitude, mgrs, timestamp, strength, operator, tech))
+            query = "INSERT INTO all_tel_data(user, latitude, longitude, mgrs, timestamp, strength, operator, tech, throughput) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            res = self.cursor.execute(query, (user, latitude, longitude, mgrs, timestamp, strength, operator, tech,throughput))
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 

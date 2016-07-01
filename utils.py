@@ -98,8 +98,8 @@ def saveData(clientdata):
             queryObj.insertInAllWifiData(client_user, ssid, client_lat, client_long, mgrs_coord, bssid, strength, italytimestamp())
 
     elif client_sensor == TYPE_TEL:
-        tech, strength, operator = client_value.split(",")
-        queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, italytimestamp(), strength, operator, tech)
+        tech, strength, operator, throughput = client_value.split(",")
+        queryObj.insertInAllTelData(client_user, client_lat, client_long, mgrs_coord, italytimestamp(), strength, operator, tech, throughput)
 
     else:
         queryObj.insertInAllSensorData(client_user, client_sensor, client_lat, client_long, mgrs_coord, client_value, italytimestamp())
