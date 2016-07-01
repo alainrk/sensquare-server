@@ -89,6 +89,17 @@ class Query:
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
 
+
+    def getSensorDataForStakeholders(self, id_stakeholder, sensor):
+        try:
+            self.cursor = self.conn.cursor()
+            res = self.cursor.execute("SELECT * FROM all_sensor_data LEFT JOIN subscription ON all_sensor_data.user = subscription.id_user AND all_sensor_data.type = subscription.sensor  WHERE subscription.id_stakeholder = %s AND subscription.sensor = %s", (id_stakeholder, sensor))
+            return self.cursor
+        except mysql.connector.Error as err:
+            print("DB ERROR: {}".format(err))
+
+
+
 ###############################################################################
 ######################### INSERT QUERIES
 ###############################################################################
