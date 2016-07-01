@@ -90,10 +90,27 @@ class Query:
             print("DB ERROR: {}".format(err))
 
     # TODO Add WHERE all_sensor_data.timestamp >= subscription.timestamp
+    # def getSensorDataForStakeholders(self, id_stakeholder, sensor):
+    #     try:
+    #         self.cursor = self.conn.cursor()
+    #         res = self.cursor.execute("SELECT * FROM all_sensor_data LEFT JOIN subscription ON all_sensor_data.user = subscription.id_user AND all_sensor_data.type = subscription.sensor  WHERE subscription.id_stakeholder = %s AND subscription.sensor = %s", (id_stakeholder, sensor))
+    #         return self.cursor
+    #     except mysql.connector.Error as err:
+    #         print("DB ERROR: {}".format(err))
+
     def getSensorDataForStakeholders(self, id_stakeholder, sensor):
         try:
             self.cursor = self.conn.cursor()
-            res = self.cursor.execute("SELECT * FROM all_sensor_data LEFT JOIN subscription ON all_sensor_data.user = subscription.id_user AND all_sensor_data.type = subscription.sensor  WHERE subscription.id_stakeholder = %s AND subscription.sensor = %s", (id_stakeholder, sensor))
+
+            table = "all_wifi_data" if sensor == TYPE_WIFI else "all_tel_data" if sensor == TYPE_TEL else "all_sensor_data"
+
+            if sensor != TYPE_TEL and sensor != TYPE_WIFI:
+                query = "SELECT * FROM all_sensor_data LEFT JOIN subscription ON all_sensor_data.user = subscription.id_user AND all_sensor_data.type = subscription.sensor  WHERE subscription.id_stakeholder = %s AND subscription.sensor = %s"
+            else:
+                query = "SELECT * FROM "+table+" LEFT JOIN subscription ON "+table+".user = subscription.id_user WHERE subscription.id_stakeholder = %s AND subscription.sensor = %s"
+
+            res = self.cursor.execute(query, (id_stakeholder, sensor))
+
             return self.cursor
         except mysql.connector.Error as err:
             print("DB ERROR: {}".format(err))
