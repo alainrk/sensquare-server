@@ -111,31 +111,36 @@ Returns (radius, timeout) based on rules in DB
 '''
 def getRadiusAndTimeoutForClient(cuser, csensor, cmgrs):
     # Index field in DB rows
-    fMGRS, fGRAN, fTIMEOUT = 3, 4, 7
+    fMGRS, fTIMEOUT, fGRANSAMPLE = 3, 7, 9
+    fStakeID = 2
 
     # Getting rules
     queryObj = Query()
     rules = list(queryObj.getAllRulesForSensor(csensor))
 
     # TODO HERE ADD ALSO SEARCH FOR STAKEHOLDERS RULES THAT CLIENT ACCEPTED
+    # BEWARE OF FIELD POSITION, DIFFERENT IN STAKEHOLDERS RULES !!!!!!!!!!!!!!
+
     # Adding them to rules, automatically then we can get the max granularity
     # in time and space for client
-    #
-    # stakeholders_accepted = list(queryObj.getSubscriptionByUserAndSensor(id_user, sensor))
-    # for s in stakeholders_accepted[stakeField]:
-    #   rules_stakeholders += list(queryObj.getAllStakeholdersRulesForSensor(sensor, stakeholder))
-    # rules += rules_stakeholders
+
+    stakeholders_accepted = list( map( lambda x:x[fStakeID], list(queryObj.getSubscriptionByUserAndSensor(cuser, csensor)) ))
+
+    rules_stakeholders = []
+    for s in stakeholders_accepted:
+      rules_stakeholders += list(queryObj.getAllStakeholdersRulesForSensor(csensor, s))
+    rules += rules_stakeholders
 
     queryObj.close()
 
-    belongs = list(filter(lambda r:belongsto(r[fMGRS], cmgrs, r[fGRAN]), rules))
+    belongs = list(filter(lambda r:belongsto(r[fMGRS], cmgrs, r[fGRANSAMPLE]), rules))
     #print(belongs)
 
     if belongs:
         # Radius from max granularity or default
-        finest = max(belongs, key=lambda x:x[fGRAN])
-        c_lat, c_long = getCenterOfMGRSInCoord(finest[fMGRS], finest[fGRAN])
-        radius = granToRadius[finest[fGRAN]]
+        finest = max(belongs, key=lambda x:x[fGRANSAMPLE])
+        c_lat, c_long = getCenterOfMGRSInCoord(finest[fMGRS], finest[fGRANSAMPLE])
+        radius = granToRadius[finest[fGRANSAMPLE]]
 
         # Timeout from min sampled
         samplest = min(belongs, key=lambda x:x[fTIMEOUT])
