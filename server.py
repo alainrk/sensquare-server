@@ -44,7 +44,8 @@ class GetSubscriptions(resource.ObservableResource):
             ###### INITIALIZE #####
             content = (request.payload).decode('utf8')
             clientdata = json.loads(content)[0] # Just one element in jsonarray received
-
+            print (clientdata)
+            print
             ###### RECEIVING ######
             queryObj = Query()
             stakeholders = list(queryObj.getStakeholders())
@@ -89,6 +90,8 @@ class UpdateSubscription(resource.ObservableResource):
 
             ###### RECEIVING ######
             clientdata = json.loads(content)
+            print (clientdata)
+            print
             cuser = clientdata[0]['user']
 
             queryObj = Query()
@@ -126,7 +129,8 @@ class SensingSend(resource.ObservableResource):
             ###### RECEIVING ######
             content = (request.payload).decode('utf8')
             clientdata = json.loads(content)[0] # Only one sensor per request
-            #print ("Received ", clientdata)
+            print (clientdata)
+            print
 
             ###### SAVE in DB ######
             saveData(clientdata)
