@@ -80,5 +80,34 @@
       </method>
     </resource>
 
+    <resource path="calc_throughput">
+      <method name="POST">
+
+        <request>
+          <param name="" type="xsd:string"
+            style="query" required="true" />
+        </request>
+
+        <response status="200">
+          <representation mediaType="application/json" element="json:responseMessage">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <!-- Empty -->
+            </param>
+          </representation>
+
+        </response>
+        <response status="400">
+          <representation mediaType="application/json" element="json:errorResponse">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <!-- Empty -->
+            </param>
+          </representation>
+        </response>
+
+      </method>
+    </resource>
+
   </resources>
 </application>
