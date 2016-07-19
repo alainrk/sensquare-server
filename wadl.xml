@@ -65,8 +65,8 @@
               </param>
             </param>
           </representation>
-
         </response>
+
         <response status="400">
           <representation mediaType="application/json" element="json:errorResponse">
             <param name="" type="xsd:jsonArray"
@@ -79,6 +79,97 @@
 
       </method>
     </resource>
+
+
+    <resource path="update_subscriptions">
+      <method name="POST">
+
+        <request>
+
+          <representation element="json:updateMessage" mediaType="application/json">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <param name="" type="xsd:jsonObject"
+                style="query" required="false">
+
+                <param name="user" style="query" type="xsd:string"/>
+                <param name="id" style="query" type="xsd:string"/>
+
+              </param>
+            </param>
+          </representation>
+
+        </request>
+
+        <response status="200" element="json:updateResponse" >
+          <!-- Empty -->
+        </response>
+
+        <response status="400">
+          <representation mediaType="application/json" element="json:errorResponse">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <!-- Empty -->
+            </param>
+          </representation>
+
+        </response>
+
+      </method>
+    </resource>
+
+
+    <resource path="get_subscriptions">
+      <method name="POST">
+
+        <request>
+
+          <representation element="json:getsubMessage" mediaType="application/json">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <param name="" type="xsd:jsonObject"
+                style="query" required="true">
+
+                <param name="user" style="query" type="xsd:string"/>
+
+              </param>
+            </param>
+          </representation>
+
+        </request>
+
+        <response status="200" element="json:getsubResponse" >
+          <representation element="json:updateMessage" mediaType="application/json">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <param name="" type="xsd:jsonObject"
+                style="query" required="true">
+
+                <param name="id" style="query" type="xsd:int"/>
+                <param name="name" style="query" type="xsd:string"/>
+                <param name="subscribed" style="query" type="xsd:int">
+                  <option value="0"/>
+                  <option value="1"/>
+                </param>
+
+              </param>
+            </param>
+          </representation>
+        </response>
+
+        <response status="400">
+          <representation mediaType="application/json" element="json:errorResponse">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <!-- Empty -->
+            </param>
+          </representation>
+
+        </response>
+
+      </method>
+    </resource>
+
 
     <resource path="calc_throughput">
       <method name="POST">
@@ -95,8 +186,8 @@
               <!-- Empty -->
             </param>
           </representation>
-
         </response>
+
         <response status="400">
           <representation mediaType="application/json" element="json:errorResponse">
             <param name="" type="xsd:jsonArray"
