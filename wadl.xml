@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://wadl.dev.java.net/2009/02 wadl.xsd"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns="http://wadl.dev.java.net/2009/02">
+
+  <grammars/>
+
+  <resources base="coap://127.0.0.1:5683/">
+
+    <resource path="sensing_send">
+      <method name="POST">
+
+        <request>
+
+          <representation element="json:requestMessage" mediaType="application/json">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <param name="" type="xsd:jsonObject"
+                style="query" required="true">
+
+                <param name="user" style="query" type="xsd:string"/>
+                <param name="time" style="query" type="xsd:long"/>
+                <param name="lat" style="query" type="xsd:double"/>
+                <param name="long" style="query" type="xsd:double"/>
+                <param name="sensor" style="query" type="xsd:int">
+                  <option value="5"/>
+                  <option value="6"/>
+                  <option value="12"/>
+                  <option value="13"/>
+                  <option value="100"/>
+                  <option value="101"/>
+                  <option value="102"/>
+                </param>
+                <param name="value" style="query" type="xsd:float"/>
+                <param name="units" style="query" type="xsd:string"/>
+
+              </param>
+            </param>
+          </representation>
+
+        </request>
+
+        <response status="200">
+          <representation mediaType="application/json" element="json:responseMessage">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <param name="" type="xsd:jsonObject"
+                style="query" required="true">
+
+                <param name="timeout" style="query" type="xsd:long"/>
+                <param name="sensor" style="query" type="xsd:int">
+                  <option value="5"/>
+                  <option value="6"/>
+                  <option value="12"/>
+                  <option value="13"/>
+                  <option value="100"/>
+                  <option value="101"/>
+                  <option value="102"/>
+                </param>
+                <param name="lat" style="query" type="xsd:double"/>
+                <param name="long" style="query" type="xsd:double"/>
+                <param name="radius" style="query" type="xsd:float"/>
+
+              </param>
+            </param>
+          </representation>
+
+        </response>
+        <response status="400">
+          <representation mediaType="application/json" element="json:errorResponse">
+            <param name="" type="xsd:jsonArray"
+              style="query" required="true">
+              <!-- Empty -->
+            </param>
+          </representation>
+
+        </response>
+
+      </method>
+    </resource>
+
+  </resources>
+</application>
