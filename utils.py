@@ -127,18 +127,14 @@ Returns (radius, timeout) based on rules in DB
 '''
 def getRadiusAndTimeoutForClient(cuser, csensor, cmgrs):
     # Index field in DB rows
-    fMGRS, fTIMEOUT, fGRANSAMPLE = 3, 7, 9
+    fMGRS, fGRANULARITY, fTIMEOUT, fGRANSAMPLE = 3, 4, 7, 9
     fStakeID = 2
 
     # Getting rules
     queryObj = Query()
-    rules = list(queryObj.getAllRulesForSensor(csensor))
-
-    # TODO HERE ADD ALSO SEARCH FOR STAKEHOLDERS RULES THAT CLIENT ACCEPTED
-    # BEWARE OF FIELD POSITION, DIFFERENT IN STAKEHOLDERS RULES !!!!!!!!!!!!!!
-
-    # Adding them to rules, automatically then we can get the max granularity
-    # in time and space for client
+    # JUST USE stakeholders_rules, redundant and problem with field number!
+    rules = []
+    #rules = list(queryObj.getAllRulesForSensor(csensor))
 
     stakeholders_accepted = list( map( lambda x:x[fStakeID], list(queryObj.getSubscriptionByUserAndSensor(cuser, csensor)) ))
 
@@ -149,6 +145,8 @@ def getRadiusAndTimeoutForClient(cuser, csensor, cmgrs):
 
     queryObj.close()
 
+    # Use of fGRANULARITY here to check belonging
+    # belongs = list(filter(lambda r:belongsto(r[fMGRS], cmgrs, r[fGRANULARITY]), rules))
     belongs = list(filter(lambda r:belongsto(r[fMGRS], cmgrs, r[fGRANSAMPLE]), rules))
     #print(belongs)
 
