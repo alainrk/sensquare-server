@@ -17,7 +17,6 @@
 from Query import *
 import mgrs
 import time
-import mgrs
 import json
 import random
 
